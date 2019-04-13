@@ -1,0 +1,24 @@
+<table>
+  <tr>
+      <th> ID</th>
+      <th>Username</th>
+      <th>RATING</th>
+      <th>ELO</th>
+  </tr>
+
+<tr>
+        <td> {{user['id'] }}</td>
+        <td> {{user['username']}}</td>
+        <td> {{user['rating']}}</td>
+        <td> 0 </td>
+</tr>
+
+{% for opp in opponents %}
+    <tr>
+        <td> {{opp['id'] }}</td>
+        <td> {{opp['username']}}</td>
+        <td> {{opp['rating']}}</td>
+        <td> {{opp['elo_diff'] }}</td>
+    </tr>
+  {% endfor %}
+</table>
