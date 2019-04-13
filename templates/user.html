@@ -4,13 +4,16 @@
       <th>Username</th>
       <th>RATING</th>
       <th>ELO</th>
+      <th>Game diff</th>
+      <th>Game diff coef</th>
   </tr>
 
 <tr>
         <td> {{user['id'] }}</td>
         <td> {{user['username']}}</td>
         <td> {{user['rating']}}</td>
-        <td> 0 </td>
+        <td> {{user['played_games'] }} </td>
+        <td> {{user['played_games'] }} </td>
 </tr>
 
 {% for opp in opponents %}
@@ -19,6 +22,8 @@
         <td> {{opp['username']}}</td>
         <td> {{opp['rating']}}</td>
         <td> {{opp['elo_diff'] }}</td>
+        <td> {{opp['game_diff'] }}</td>
+        <td> {{opp['game_diff_coef'] }}</td>
     </tr>
   {% endfor %}
 </table>

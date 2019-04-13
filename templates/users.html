@@ -3,6 +3,7 @@
       <th> ID</th>
       <th>Username</th>
       <th>RATING</th>
+      <th>Games</th>
   </tr>
 
 {% for user in users %}
@@ -10,6 +11,8 @@
         <td> {{user['id'] }}</td>
         <td> {{user['username']}}</td>
         <td> {{user['rating']}}</td>
+        <td> {{user['played_games']}}</td>
+
     </tr>
   {% endfor %}
 </table>

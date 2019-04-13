@@ -1,0 +1,14 @@
+<table>
+  <tr>
+      <th> TIME </th>
+
+      <th> EXPECTED </th>
+  </tr>
+
+{% for x in waiting %}
+    <tr>
+        <td> {{x['time'] }}</td>
+        <td> {{x['expected']}}</td>
+    </tr>
+  {% endfor %}
+</table>
