@@ -90,6 +90,7 @@ def calculate_number_of_games(player1_id, player2_id):
     return max(number_of_games_by_first, number_of_games_by_second)
 
 
+@app.route('/create_new_game/<player_id>')
 def create_new_game(player_id):
     date_created = str(int(time.time()))
 
@@ -100,6 +101,7 @@ def create_new_game(player_id):
         'player_id': player_id,
         'date_created': date_created
     }))
+    return 'Game created'
 
 
 @app.route('/new_game/<id>')
@@ -224,6 +226,7 @@ def show_games():
 
     for key in games:
         game = json.loads(r.get(key))
+        game['rating'] = json.loads(r.get('users:' + str(game['player_id'])))['rating']
         game_list.append(game)
 
     return render_template('games.html', games=game_list)

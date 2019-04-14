@@ -6,6 +6,7 @@
       <tr>
           <th scope="col">ID</th>
           <th scope="col">Player 1 ID</th>
+          <th scope="col">Rating</th>
           <th scope="col">Date created</th>
       </tr>
     </thead>
@@ -14,6 +15,8 @@
     <tr>
         <td> {{game['id'] }}</td>
         <td> {{game['player_id']}}</td>
+
+        <td> {{game['rating']}}</td>
         <td> {{game['date_created']}}</td>
     </tr>
   {% endfor %}
