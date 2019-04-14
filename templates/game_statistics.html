@@ -16,15 +16,20 @@
     </thead>
 
     {% for game in games %}
-    <tr>
-        <td> {{game['id'] }}</td>
-        <td> {{game['player_id']}}</td>
-        <td> {{game['date_created']}}</td>
-        <td> {{game['probability']}}</td>
-        <td> {{game['chosen']}}</td>
-        <td> {{game['elo']}}</td>
-        <td> {{game['last_games']}}</td>
-    </tr>
+
+        {% if game['chosen'] %}
+            <tr class="bg-success">
+        {% else %}
+            <tr>
+        {% endif %}
+                <td> {{game['id'] }}</td>
+                <td> {{game['player_id']}}</td>
+                <td> {{game['date_created']}}</td>
+                <td> {{game['probability']}}</td>
+                <td>{{game['chosen']}}</td>
+                <td> {{game['elo']}}</td>
+                <td> {{game['last_games']}}</td>
+            </tr>
   {% endfor %}
 </table>
 {% endblock %}
