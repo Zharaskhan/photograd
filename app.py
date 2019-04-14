@@ -49,7 +49,7 @@ def expected_waiting(A):
 
 
 def expected_game(A, B):
-    return (1 - (abs(1 / (1 + 10 ** ((B - A) / 50)) - 0.5))) * 100
+    return (0.5 - (abs(1 / (1 + 10 ** ((B - A) / 50)) - 0.5))) * 200
 
 
 def expected_score(player1_id, player2_id, waiting_time):
