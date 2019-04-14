@@ -1,0 +1,30 @@
+{% extends "main.html" %}
+{% block title %}Users{% endblock %}
+{% block content %}
+<table class="table table-striped">
+    <thead>
+      <tr>
+          <th scope="col">ID</th>
+          <th scope="col">Player 1 ID</th>
+          <th scope="col">Date created</th>
+          <th scope="col">Probability</th>
+          <th scope="col">Chosen</th>
+
+          <th scope="col">Elo</th>
+          <th scope="col">Number of games</th>
+      </tr>
+    </thead>
+
+    {% for game in games %}
+    <tr>
+        <td> {{game['id'] }}</td>
+        <td> {{game['player_id']}}</td>
+        <td> {{game['date_created']}}</td>
+        <td> {{game['probability']}}</td>
+        <td> {{game['chosen']}}</td>
+        <td> {{game['elo']}}</td>
+        <td> {{game['last_games']}}</td>
+    </tr>
+  {% endfor %}
+</table>
+{% endblock %}

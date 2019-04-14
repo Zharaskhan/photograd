@@ -1,0 +1,21 @@
+{% extends "main.html" %}
+{% block title %}Games{% endblock %}
+{% block content %}
+<table class="table table-striped">
+    <thead>
+      <tr>
+          <th scope="col">ID</th>
+          <th scope="col">Player 1 ID</th>
+          <th scope="col">Date created</th>
+      </tr>
+    </thead>
+
+    {% for game in games %}
+    <tr>
+        <td> {{game['id'] }}</td>
+        <td> {{game['player_id']}}</td>
+        <td> {{game['date_created']}}</td>
+    </tr>
+  {% endfor %}
+</table>
+{% endblock %}

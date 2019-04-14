@@ -22,10 +22,10 @@ def upload_user_data():
     with open('data.json') as json_file:
         data = json.load(json_file)
         for p in data['data']['top_rating']:
-           # print('Name: ' + p['username'])
-           # print('ID: ' + str(p['id']))
-           # print('Rating: ' + str(p['rating']))
-           # print('\n')
+            # print('Name: ' + p['username'])
+            # print('ID: ' + str(p['id']))
+            # print('Rating: ' + str(p['rating']))
+            # print('\n')
             users.append(
                 {
                     'username': p['username'],
@@ -41,7 +41,7 @@ def upload_user_data():
 
 
 def expected_elo(A, B):
-    return (1 - (abs(1 / (1 + 10 ** ((B - A) / 400)) - 0.5))) * 100
+    return (0.5 - (abs(1 / (1 + 10 ** ((B - A) / 400)) - 0.5))) * 200
 
 
 def expected_waiting(A):
@@ -52,10 +52,21 @@ def expected_game(A, B):
     return (1 - (abs(1 / (1 + 10 ** ((B - A) / 50)) - 0.5))) * 100
 
 
+def expected_score(player1_id, player2_id, waiting_time):
+    player1 = json.loads(r.get('users:' + str(player1_id)))
+    player2 = json.loads(r.get('users:' + str(player2_id)))
+
+    return expected_elo(player1['rating'],
+                        player2['rating']) * 0.4 + expected_waiting(
+        float(waiting_time)) * 0.4 + expected_game(player1['played_games'],
+                                                   player2[
+                                                       'played_games']) * 0.2
+
+
 def play_game(game_id, player1_id, player2_id):
     r.delete('games:' + game_id)
     r.lpush('played_games:' + player1_id, player2_id)
-    #store last 5 played games
+    # store last 5 played games
     r.ltrim('played_games:' + player1_id, 0, 4)
 
     r.lpush('played_games:' + player2_id, player1_id)
@@ -85,35 +96,89 @@ def create_new_game(player_id):
     print('New game created')
 
     r.set('games:' + date_created, json.dumps({
+        'id': date_created,
         'player_id': player_id,
         'date_created': date_created
     }))
 
 
+@app.route('/new_game/<id>')
 def new_game(id):
-    games = json.loads(r.get('games:*'))
+    games = r.keys('games:*')
     waiting_games = []
-    if games:
-        for key in games:
-            game = json.loads(r.get(key))
-            opponent_id = int(game['player_id'])
 
-            if opponent_id == id:
-                continue
+    for key in games:
+        game = json.loads(r.get(key))
+        opponent_id = int(game['player_id'])
 
-            if calculate_number_of_games(id, opponent_id) >= 4:
-                print('Skipped by number of games')
-                continue
+        if int(opponent_id) == int(id):
+            continue
 
-            waiting_games.append(game)
+        if calculate_number_of_games(id, opponent_id) >= 4:
+            print('Skipped by number of games')
+            continue
 
-    if len(waiting_games) == 0:
-        create_new_game(id)
+        waiting_games.append(game)
+
+    found = False
+
+    stats = []
+
+    if len(waiting_games) != 0:
+        score_sum = 0
+        for game in waiting_games:
+            score = expected_score(id, game['player_id'], game['date_created'])
+            score_sum += score
+
+        # createing new game
+        ng = 100 / min(10, len(waiting_games))
+        score_sum += ng
+
+        rnd_sum = random.random() * score_sum
+        cur_sum = 0
+
+        for game in waiting_games:
+            score = expected_score(id, game['player_id'], game['date_created'])
+
+            if cur_sum <= rnd_sum <= cur_sum + score:
+                play_game(game['id'], id, game['player_id'])
+                found = True
+                break
+
+            cur_sum += score
+
+        cur_sum = 0
+        for game in waiting_games:
+            g = game
+            g['probability'] = expected_score(id, game['player_id'],
+                                              game['date_created']) / score_sum * 100
+
+            g['chosen'] = False
+
+            player1 = json.loads(r.get('users:' + str(id)))
+            player2 = json.loads(r.get('users:' + str(game['player_id'])))
+            g['elo'] = expected_elo(player1['rating'],player2['rating'])
+            g['last_games'] = calculate_number_of_games(id, game['player_id'])
+
+
+            if cur_sum <= rnd_sum <= cur_sum + score:
+                g['chosen'] = True
+
+            cur_sum += score
+
+            stats.append(g)
+
+        stats.append({'id': 'new game', 'player_id': 'new game', 'probability': ng / score_sum * 100, 'date_created': str(int(time.time())), 'chosen': found == False})
     else:
-        print(waiting_games)
+        stats.append({'id': 'new game', 'player_id': 'new game',
+                      'probability': 100,
+                      'date_created': str(int(time.time())),
+                      'chosen': found == False})
 
+    if found == False:
+        create_new_game(id)
 
-
+    return render_template('game_statistics.html', games=stats)
 
 
 @app.route('/user/<id>')
@@ -124,10 +189,12 @@ def page(id):
         new_opp = opp
         new_opp['elo_diff'] = expected_elo(user['rating'], opp['rating'])
         new_opp['game_diff'] = user['played_games'] - opp['played_games']
-        new_opp['game_diff_coef'] = expected_game(user['played_games'], opp['played_games'])
+        new_opp['game_diff_coef'] = expected_game(user['played_games'],
+                                                  opp['played_games'])
         opponents.append(new_opp)
 
     return render_template('user.html', user=user, opponents=opponents)
+
 
 def get_all_users():
     users = []
@@ -137,6 +204,29 @@ def get_all_users():
         users.append(json.loads(r.get(key)))
 
     return users
+
+
+@app.route('/clear_games')
+def clear_games():
+
+    for key in r.keys('games:*'):
+        r.delete(key)
+
+    for key in r.keys('played_games:*'):
+        r.delete(key)
+    return 'Success'
+
+
+@app.route('/games')
+def show_games():
+    games = r.keys('games:*')
+    game_list = []
+
+    for key in games:
+        game = json.loads(r.get(key))
+        game_list.append(game)
+
+    return render_template('games.html', games=game_list)
 
 
 @app.route('/time')

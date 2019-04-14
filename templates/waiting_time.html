@@ -1,14 +1,27 @@
-<table>
-  <tr>
-      <th> TIME </th>
+{% extends "main.html" %}
+{% block title %}Users{% endblock %}
+{% block content %}
+<table class="table table-striped">
+    <thead>
+      <tr>
+         <th> TIME </th>
 
-      <th> EXPECTED </th>
-  </tr>
+          <th> EXPECTED </th>
+          <th> Progress </th>
+      </tr>
+    </thead>
 
-{% for x in waiting %}
-    <tr>
-        <td> {{x['time'] }}</td>
-        <td> {{x['expected']}}</td>
-    </tr>
-  {% endfor %}
+    {% for x in waiting %}
+        <tr>
+                <td> {{x['time'] }}</td>
+                <td> {{x['expected']}}</td>
+                <td>
+                    <div class="progress">
+                        <div class="progress-bar progress-bar-striped" role="progressbar" style="width: {{x['expected']}}%" aria-valuenow="{{x['expected']}}" aria-valuemin="0" aria-valuemax="100"></div>
+                    </div>
+                </td>
+        </tr>
+    {% endfor %}
+
 </table>
+{% endblock %}

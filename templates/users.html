@@ -1,18 +1,23 @@
-<table>
-  <tr>
-      <th> ID</th>
-      <th>Username</th>
-      <th>RATING</th>
-      <th>Games</th>
-  </tr>
+{% extends "main.html" %}
+{% block title %}Users{% endblock %}
+{% block content %}
+<table class="table table-striped">
+    <thead>
+      <tr>
+          <th scope="col"> ID</th>
+          <th scope="col">Username</th>
+          <th scope="col">RATING</th>
+          <th scope="col">Games</th>
+      </tr>
+    </thead>
 
-{% for user in users %}
+    {% for user in users %}
     <tr>
         <td> {{user['id'] }}</td>
         <td> {{user['username']}}</td>
         <td> {{user['rating']}}</td>
         <td> {{user['played_games']}}</td>
-
     </tr>
   {% endfor %}
 </table>
+{% endblock %}

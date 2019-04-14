@@ -1,12 +1,18 @@
-<table>
-  <tr>
-      <th> ID</th>
-      <th>Username</th>
-      <th>RATING</th>
-      <th>ELO</th>
-      <th>Game diff</th>
-      <th>Game diff coef</th>
-  </tr>
+{% extends "main.html" %}
+{% block title %}Users{% endblock %}
+{% block content %}
+
+<table class="table table-striped">
+    <thead>
+      <tr>
+          <th scope="col"> ID</th>
+          <th scope="col">Username</th>
+          <th scope="col">RATING</th>
+          <th scope="col">ELO</th>
+          <th scope="col">Game diff</th>
+          <th scope="col">Game diff coef</th>
+      </tr>
+    </thead>
 
 <tr>
         <td> {{user['id'] }}</td>
@@ -27,3 +33,4 @@
     </tr>
   {% endfor %}
 </table>
+{% endblock %}
